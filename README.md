@@ -27,5 +27,6 @@ As part of the configuration we are going to generate the kube-dashboard to visu
 Following the order in the Makefile makes the process run in order.
 
 #### Create the helmfiles
-In the directory there are two files one containing the dev and the other stage environments:
+In the directory there are two environments one containing the dev and the other stage environments, the example include a secret encrypted and a value passed to as part of the of the image.
 
+Following the Make targets get a helm chart deployed by helmfile
