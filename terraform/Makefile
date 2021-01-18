@@ -1,4 +1,4 @@
-.PHONY : 
+.PHONY : init plan apply generate-kubeconfig kube-dashboard kube-dashboard-access kube-dashboard-token kube-namespace-dev kube-namespace-stage
 
 .DEFAULT_GOAL = help
 
@@ -22,9 +22,13 @@ plan:
 apply:
 	terraform apply
 
+## terraform destroy
+destroy:
+	terraform apply
+
 ## Generate Kubeconfig
 generate-kubeconfig:
-	gcloud container clusters get-credentials $(terraform output kubernetes_cluster_name) --region $(terraform output region)
+	@gcloud container clusters get-credentials $(terraform output kubernetes_cluster_name)
 
 ## Create the dashboard
 kube-dashboard:
@@ -34,14 +38,13 @@ kube-dashboard:
 kube-proxy:
 	kubectl proxy
 
-
 ## Authenticate in the kubernetes dashboard creating the accesses
 kube-dashboard-access:
 	kubectl apply -f  kubernetes-configs/kubernetes-dashboard-admin.rbac.yaml
 
 ## Generate the token to get access to the Kube token
 kube-dashboard-token:
-	kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep service-controller-token | awk '{print $1}')
+	@kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep service-controller-token | awk '{print $1}')
 
 ## Create namespaces for the applications Dev
 kube-namespace-dev:
