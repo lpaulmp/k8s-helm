@@ -1,0 +1,10 @@
+bases:
+  - environments.yaml
+
+releases:
+  - name: nginx-demo
+    namespace: {{ .Namespace }}
+    atomic: true
+    labels:
+      app: nginxDemo
+    chart: ./charts/nginx-demo

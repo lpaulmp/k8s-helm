@@ -1,0 +1,6 @@
+charts:
+  - name: dev-nginx-demo
+    namespace: dev
+    chart: ../../charts/nginx-demo/
+    values:
+      - ../../values/dev/nginx-demo/values.yaml

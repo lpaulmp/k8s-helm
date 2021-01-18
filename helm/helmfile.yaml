@@ -1,0 +1,11 @@
+helmDefaults:
+  cleanupOnFail: true
+  timeout: 600
+  recreatePods: false
+  createNamespace: false
+
+bases:
+  - environments.yaml
+
+helmfiles:
+  - nginx-demo.yaml

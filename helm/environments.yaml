@@ -1,0 +1,13 @@
+environments:
+  dev:
+    values:
+      - envs/dev/charts.yaml
+    secrets:
+      - envs/stage/secrets.yaml
+  stage:
+    values:
+      - envs/dev/charts.yaml
+    secrets:
+      - envs/stage/secrets.yaml
+
+
