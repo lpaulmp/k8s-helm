@@ -26,9 +26,14 @@ apply:
 destroy:
 	terraform apply
 
+## Google auth login
+auth:
+	gcloud auth login
+
 ## Generate Kubeconfig
 generate-kubeconfig:
-	@gcloud container clusters get-credentials $(terraform output kubernetes_cluster_name)
+	#@gcloud container clusters get-credentials $(terraform output kubernetes_cluster_name)
+	gcloud container clusters get-credentials kubernetes-helm-challenge-pm-gke
 
 ## Create the dashboard
 kube-dashboard:

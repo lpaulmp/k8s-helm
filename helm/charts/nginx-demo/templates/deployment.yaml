@@ -34,10 +34,11 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
 
-          {{- with .Values.container.envVars }}
           env:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
+            - name:   {{ .Values.envVars.envRef}}
+              value:  {{ .Values.envVars.envValue }}
+            - name:   {{ .Values.secrets.secretRef }}
+              value:  {{ .Values.secrets.secretValue }}
           ports:
             - name: http
               containerPort: 80

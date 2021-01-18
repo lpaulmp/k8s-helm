@@ -2,6 +2,13 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+envVars:
+  envRef:      ENVIRONMENT
+  envValue:    "render-env"
+
+secrets:
+  secretRef:   SECRET_VAlUE
+  secretValue: "my-secret"
 
 replicaCount: 3
 
@@ -11,13 +18,6 @@ image:
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
-
-  #container:
-  #  envVars:
-  #    - name: ENVIRONMENT
-  #      value: "env"
-  #    - name: SECRET_VAR
-  #      value: "secret"
 
 imagePullSecrets: []
 nameOverride: ""

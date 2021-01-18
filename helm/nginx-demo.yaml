@@ -8,3 +8,7 @@ releases:
     labels:
       app: nginxDemo
     chart: ./charts/nginx-demo
+    secrets:
+      - envs/{{ .Environment.Name }}/secrets.yaml
+    values:
+      - envs/{{ .Environment.Name }}/values.yaml.gotmpl

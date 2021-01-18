@@ -1,6 +1,0 @@
-namespace: dev
-
-container:
-  envVars:
-    - name: ENVIRONMENT
-      value: "dev"

@@ -37,13 +37,13 @@ helm-plugin-install-diff:
 	helm plugin install https://github.com/databus23/helm-diff --version v3.1.3
 
 # Encrypt secrets with helm secrets
-helm-encrypt: require-SECRET_FILE_PATH
-	helm secrets enc ${SECRET_FILE_PATH}
+helm-encrypt: require-FILE_PATH
+	helm secrets enc ${FILE_PATH}
 
 # Decrypt secrets with helm secrets
 #
-helm-decrypt: require-SECRET_FILE_PATH
-	helm secrets dec ${SECRET_FILE_PATH}
+helm-decrypt: require-FILE_PATH
+	helm secrets dec ${FILE_PATH}
 
 # Create a KMS on GCE
 generate-sop-kme-gce:

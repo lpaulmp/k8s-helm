@@ -1,13 +1,7 @@
 environments:
   dev:
-    values:
-      - envs/dev/values.yaml
     secrets:
-      - envs/stage/secrets.yaml
+      - envs/dev/secrets.yaml
   stage:
-    values:
-      - envs/dev/values.yaml
     secrets:
       - envs/stage/secrets.yaml
-
-

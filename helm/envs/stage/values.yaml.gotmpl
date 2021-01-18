@@ -1,0 +1,9 @@
+image:
+  repository: nginxdemos/hello
+  tag: 0.2
+
+envVars:
+  envValue: "stage"
+
+secrets:
+    secretValue: {{ .Values.secretValue }}

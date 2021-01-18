@@ -1,5 +1,0 @@
-namespace: stage
-
-container.envVars:
-    - name: ENVIRONMENT
-      value: "stage"

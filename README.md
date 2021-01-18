@@ -1,8 +1,16 @@
+### Project components
+The root directory presents four items:
+
+- The presentation about the project and the main insights
+- The executive file of the project
+- Terraform directory that contains the infrastructure code
+- Helm directory where is located the charts and the application configurations
+
+
 ### Kubernetes - Helm project
 
-This repository demostrates how to deploy a kubernetes cluster in Google Cloud and
-how to continues deployement is availble through CircleCI tool,
----the repository uses make targets to simplify typing commands and the correct order.
+This repository demostrates how to deploy a kubernetes cluster in Google Cloud and an application
+through helmfile,the repository uses make targets to simplify typing commands and the correct order.
 these are the steps to create from scratch a Kubernetes cluster and services:
 
 #### Deploy Kubernetes cluster with Terraform
@@ -30,3 +38,12 @@ Following the order in the Makefile makes the process run in order.
 In the directory there are two environments one containing the dev and the other stage environments, the example include a secret encrypted and a value passed to as part of the of the image.
 
 Following the Make targets get a helm chart deployed by helmfile
+```
+cd helm
+make helm-apply-dev
+```
+
+```
+cd helm
+make helm-apply-stage
+```

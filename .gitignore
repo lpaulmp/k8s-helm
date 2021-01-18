@@ -11,4 +11,4 @@
 
 # sops file
 *.sops.yaml
-
+*.dec
