@@ -1,12 +1,12 @@
 environments:
   dev:
     values:
-      - envs/dev/charts.yaml
+      - envs/dev/values.yaml
     secrets:
       - envs/stage/secrets.yaml
   stage:
     values:
-      - envs/dev/charts.yaml
+      - envs/dev/values.yaml
     secrets:
       - envs/stage/secrets.yaml
 

@@ -2,8 +2,8 @@ bases:
   - environments.yaml
 
 releases:
-  - name: nginx-demo
-    namespace: {{ .Namespace }}
+  - name: nginx-demo-{{ .Environment.Name }}
+    namespace: {{ .Environment.Name }}
     atomic: true
     labels:
       app: nginxDemo

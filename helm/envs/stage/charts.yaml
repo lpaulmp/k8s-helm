@@ -1,6 +1,0 @@
-charts:
-  - name: stage-nginx-demo
-    namespace: stage
-    chart: ../../charts/nginx-demo/
-    values:
-      - ../../values/stage/nginx-demo/values.yaml
