@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Google Cloud Platform Challenge</title>
+
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/white.css" id="theme">
+    <link rel="stylesheet" href="plugin/highlight/monokai.css">
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<div class="slides">
+
+                <!-- Use external markdown resource, separate slides by three newlines; vertical slides by two newlines 
+                <section data-markdown="markdown.md" data-separator="^\n\n\n" data-separator-vertical="^\n\n">
+                </section>
+                -->
+
+                <!-- Slides are separated by three dashes (quick 'n dirty regular expression) -->
+                <section data-background="#888888" data-markdown data-separator="---">
+                    <script type="text/template">
+                        # Google Cloud challenge
+                        By Paul Montero
+                    </script>
+                </section>
+
+
+                <!-- Slides are separated by three dashes (quick 'n dirty regular expression) -->
+                <section data-background-color="#934f4d" data-markdown data-separator="---">
+                    <script type="text/template">
+                        ### Goals of the project
+                        - Interact with Google Cloud Kubernetes and the API <!-- .element: class="fragment" data-fragment-index="1" -->
+                        - Generate a high availability Kubernetes Cluster <!-- .element: class="fragment" data-fragment-index="2" -->
+                        - Creating a helm project to present a demo app   <!-- .element: class="fragment" data-fragment-index="3" -->
+                        - The app is deployed available to visualize in a web Browser <!-- .element: class="fragment" data-fragment-index="4" -->
+
+                    </script>
+                </section>
+
+
+                <!-- Slides are separated by three dashes (quick 'n dirty regular expression) -->
+                <section data-background-color="#888888" data-markdown data-separator="---">
+                    <script type="text/template">
+                        ### Tools
+                        - Gcloud binary <!-- .element: class="fragment" data-fragment-index="1" -->
+                        - Terraform version  0.14 <!-- .element: class="fragment" data-fragment-index="2" -->
+                        - Helm version 0.3.4.2 <!-- .element: class="fragment" data-fragment-index="3" -->
+                        - Helmfile version 0.135 <!-- .element: class="fragment" data-fragment-index="4" -->
+
+                        ---
+                        ### Helm pluggins
+                        - helm secrets <!-- .element: class="fragment" data-fragment-index="0" -->
+                        - sop to encrypt and decrypt secrets <!-- .element: class="fragment" data-fragment-index="1" -->
+                        - helm diff <!-- .element: class="fragment" data-fragment-index="2" -->
+
+                    </script>
+                </section>
+
+                <!-- Slides are separated by three dashes (quick 'n dirty regular expression) -->
+                <section data-background-color="#934f4d" data-markdown data-separator="---">
+                    <script type="text/template">
+                        ### Architecture
+                        Google Cloud Kubernetes
+                        - Three nodes running per region within a managed node pool <!-- .element: class="fragment" data-fragment-index="0" -->
+                        - One load balacer <!-- .element: class="fragment" data-fragment-index="1" -->
+                        - Default configurion for pods <!-- .element: class="fragment" data-fragment-index="2" -->
+                        ---
+                        ### Architecture
+                        Demo Application
+                        - Two stages to deploy the nginx-demo app: DEV and STAGE <!-- .element: class="fragment" data-fragment-index="1" -->
+                        - The service creates a load balancer <!-- .element: class="fragment" data-fragment-index="2" -->
+                    </script>
+                </section>
+
+
+                <!-- Slides are separated by three dashes (quick 'n dirty regular expression) -->
+                <section data-background-color="lightblue" data-markdown data-separator="---">
+                    <script type="text/template">
+                        ### Terraform
+                        Terrafor has available resources to create a kubernetes cluster within GCP
+                        ---
+
+                        ### Terraform
+                        - Resourece `google_container_cluster`
+                        ```terraform [1|8-10]
+                          resource "google_container_cluster" "primary" {
+                            name     = "${var.project_id}-gke"
+                            location = var.region
+                            remove_default_node_pool = true
+                            initial_node_count       = 1
+                            network    = google_compute_network.vpc.name
+                            subnetwork = google_compute_subnetwork.subnet.name
+                            master_auth {
+                              username = var.gke_username
+                              password = var.gke_password
+                              client_certificate_config {
+                                issue_client_certificate = false
+                              }
+                            }
+                          }
+                        ```
+                        ---
+                        ### Terraform
+                        - Resource `google_containe_node_poolr`
+                        ```terraform  [1|8-9]
+                        resource "google_container_node_pool" "primary_nodes" {
+                          name       = "${google_container_cluster.primary.name}-pool"
+                          location   = var.region
+                          cluster    = google_container_cluster.primary.name
+                          node_count = var.gke_num_nodes
+                          node_config {
+                            oauth_scopes = [
+                              "https://www.googleapis.com/auth/logging.write",
+                              "https://www.googleapis.com/auth/monitoring",
+                            ]
+
+                            labels = {
+                              env = var.project_id
+                            }
+                            machine_type = "n1-standard-1"
+                            tags         = ["gke-node", "${var.project_id}-gke"]
+                            metadata = {
+                              disable-legacy-endpoints = "true"
+                            }
+                          }
+                        }
+                        ```
+                    </script>
+                </section>
+
+                <!-- Slides are separated by three dashes (quick 'n dirty regular expression) -->
+                <section data-background-color="#934f4d" data-markdown data-separator="---">
+                    <script type="text/template">
+                        ### Helm
+                        The chart is generated using helm binary
+
+                        ---
+                        ### Helm
+                        Define values
+                        ``` yaml [3-5|6-11|13-16]
+                          helm/charts/nginx-demo/values.yaml
+
+                          image:
+                            name: nginx-demo
+                            repository: nginxdemos/hello
+
+                          service:
+                             type: LoadBalancer
+                             port: 80
+                             annotations:
+                               kubernetes.io/ingress.class: gce
+
+                          ingress:
+                            enabled: true
+                            annotations:
+                              kubernetes.io/ingress.class: gce
+                            hosts:
+                              - host: nginx.paulmp.local
+                                paths:
+                                  - path: "/"
+
+                        ```
+                        ---
+
+                        ### Helm
+                        Environment variables
+                        ``` yaml [1|5|9]
+                          helm/charts/nginx-demo/values.yaml
+
+                          envVars:
+                            envRef:      ENVIRONMENT
+                            envValue:    "render-env"
+
+                          secrets:
+                            secretRef:   SECRET_VAlUE
+                            secretValue: "my-secret"
+
+                        ```
+                        ---
+                        ### Helmfile
+                        Helmfile overwrite values according the environment
+                        ![Directory tree](images/directory-tree.png )
+                        ---
+                        ### Helmfile
+                        Base configuration
+                        ``` yaml [1|9-10|12-13]
+                        helm/helmfile.yaml
+
+                        helmDefaults:
+                        cleanupOnFail: true
+                        timeout: 600
+                        recreatePods: false
+                        createNamespace: false
+
+                        bases:
+                          - environments.yaml
+
+                        helmfiles:
+                          - nginx-demo.yaml
+                        ```
+                        ---
+                        ### Helmfile
+                        Base configuration
+                        ```yaml [1|3-4|6|13-16]
+                        helm/nginx-demo.yaml
+
+                        bases:
+                          - environments.yaml
+
+                        releases:
+                          - name: nginx-demo-{{ .Environment.Name }}
+                            namespace: {{ .Environment.Name }}
+                            atomic: true
+                            labels:
+                              app: nginxDemo
+                            chart: ./charts/nginx-demo
+                            secrets:
+                              - envs/{{ .Environment.Name }}/secrets.yaml
+                            values:
+                              - envs/{{ .Environment.Name }}/values.yaml.gotmpl
+                        ```
+                    </script>
+                </section>
+
+                <!-- Slides are separated by three dashes (quick 'n dirty regular expression) -->
+                <section data-background-color="#888888" data-markdown >
+                    <script type="text/template">
+                        ### Cost
+
+                        ---
+
+                        Kubernetes cluster managementt $72/mo
+
+                        ---
+
+                        For all instances running a month $102.6/mo
+
+                        ---
+
+                        Load Balancers per month $18/mo
+
+                        ---
+
+                        Total $192.6/mo
+
+                        ---
+                    </script>
+                </section>
+
+                <!-- Slides are separated by three dashes (quick 'n dirty regular expression) -->
+                <section data-background-color="lightblue" data-markdown data-separator="---">
+                    <script type="text/template">
+                        ### Q & A
+                        Thank you
+                    </script>
+                </section>
+
+            </div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+        <script src="plugin/markdown/markdown.js"></script>
+        <script src="plugin/highlight/highlight.js"></script>
+        <script src="plugin/notes/notes.js"></script>
+
+		<script>
+
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+			});
+
+		</script>
+
+	</body>
+</html>
